@@ -1,24 +1,59 @@
 public class SpinGraph {
-	int[] ecken;
+	byte[] finalConfig;
+	byte[][] eckenKombinationen;
 	private float[][] kanten;
+	boolean minIsSet = false;
+	float min = 0;
 
-	public SpinGraph(float[][] ecken) {
-		this.kanten = ecken;
-		this.ecken = new int[ecken.length];
-		System.out.println(energieBerechnen());
-	}
-
-	public float energieBerechnen() {
-		float energie = 0;
-		for(int i = 0; i < ecken.length; i++) {
-			ecken[i] = 1;
+	public SpinGraph(float[][] kanten) {
+		this.kanten = kanten;
+		this.finalConfig = null;
+		this.eckenKombinationen = new byte[(int) Math.pow(2, kanten.length)][kanten.length];
+		moeglichkeiten();
+		for(byte[] config : eckenKombinationen) {
+			float energieConfig = energieBerechnen(config);
+//			System.out.println(energieConfig);
+			if(minIsSet){
+				min = energieConfig;
+				minIsSet = true;
+			} else if(energieConfig < min) {
+					min = energieConfig;
+					this.finalConfig = config;
+			}
 		}
+	}
+	
+	
+	public void moeglichkeiten() {
+		for(int i = 0; i < eckenKombinationen.length; i++) {
+			String iBinary = Integer.toBinaryString(i);
+			for(int j = 0; j < eckenKombinationen[i].length; j++) {
+				if(j < iBinary.length()) {
+					eckenKombinationen[i][eckenKombinationen[i].length - j - 1] = (byte) Integer.parseInt(String.valueOf(iBinary.charAt(iBinary.length() - j - 1)));
+				} else
+					eckenKombinationen[i][eckenKombinationen[i].length - j - 1] = 0;
+			}
+		}
+	}
+	
+	
+	public float energieBerechnen(byte[] config) {
+		float energie = 0;
+		for(int i = 0; i < config.length; i++)
+			config[i] = (byte) (config[i] * 2 -1);
+		
 		for (int i = 0; i < kanten.length; i++) {
 			for (int j = 0; j < kanten.length; j++) {
-				System.out.println(ecken[i] + " * " + ecken[j] +  " * " + kanten[i][j] + " = " + (kanten[i][j] * ecken[i] * ecken[j]));
-				energie += kanten[i][j] * ecken[i] * ecken[j];
+				energie += kanten[i][j] * config[i] * config[j];
 			}
 		}
 		return energie;
+	}
+	
+	public void printPerfectConfig() {
+		System.out.println("Minimale Energie: " + min);
+		for(byte ecke : finalConfig) {
+			System.out.println(ecke);
+		}
 	}
 }
