@@ -1,7 +1,7 @@
 public class SpinGraph {
 	byte[] finalConfig;
 	byte[][] eckenKombinationen;
-	private float[][] kanten;
+	float[][] kanten;
 	boolean minIsSet = false;
 	float min = 0;
 
@@ -9,10 +9,10 @@ public class SpinGraph {
 		this.kanten = kanten;
 		this.finalConfig = null;
 		this.eckenKombinationen = new byte[(int) Math.pow(2, kanten.length)][kanten.length];
-		moeglichkeiten();
+		erstelleMoeglichkeitenArray();
+		boolean minIsSet = false;
 		for(byte[] config : eckenKombinationen) {
-			float energieConfig = energieBerechnen(config);
-//			System.out.println(energieConfig);
+			float energieConfig = berechneEnergie(config);
 			if(minIsSet){
 				min = energieConfig;
 				minIsSet = true;
@@ -24,7 +24,7 @@ public class SpinGraph {
 	}
 	
 	
-	public void moeglichkeiten() {
+	public void erstelleMoeglichkeitenArray() {
 		for(int i = 0; i < eckenKombinationen.length; i++) {
 			String iBinary = Integer.toBinaryString(i);
 			for(int j = 0; j < eckenKombinationen[i].length; j++) {
@@ -37,7 +37,7 @@ public class SpinGraph {
 	}
 	
 	
-	public float energieBerechnen(byte[] config) {
+	public float berechneEnergie(byte[] config) {
 		float energie = 0;
 		for(int i = 0; i < config.length; i++)
 			config[i] = (byte) (config[i] * 2 -1);
